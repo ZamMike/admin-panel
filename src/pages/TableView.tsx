@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useParams, useOutletContext } from 'react-router-dom'
 import { Table2, Plus, Download } from 'lucide-react'
 import { DataTable } from '@/components/table/DataTable'
@@ -22,6 +22,14 @@ export function TableView() {
   const [refreshKey, setRefreshKey] = useState(0)
 
   const refresh = useCallback(() => setRefreshKey((k) => k + 1), [])
+
+  // Reset state when switching between tables
+  useEffect(() => {
+    setSelectedRow(null)
+    setEditRow(null)
+    setSelectedIds(new Set())
+    setRefreshKey(0)
+  }, [name])
 
   async function handleDelete(id: string) {
     if (!name) return

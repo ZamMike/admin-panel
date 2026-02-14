@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom'
+import { createBrowserRouter, RouterProvider, Navigate, useParams } from 'react-router-dom'
 import { AuthProvider, useAuth } from '@/lib/auth'
 import { AppLayout } from '@/components/layout/AppLayout'
 import { Login } from '@/pages/Login'
@@ -7,6 +7,12 @@ import { TableView } from '@/pages/TableView'
 import { UsersPage } from '@/pages/Users'
 import { SqlRunner } from '@/pages/SqlRunner'
 import { AuditLogs } from '@/pages/AuditLogs'
+
+// Wrapper: forces TableView full remount when :name param changes
+function TableViewKeyed() {
+  const { name } = useParams()
+  return <TableView key={name} />
+}
 
 // Auth guard — renders layout or redirects to login
 function ProtectedLayout() {
@@ -53,7 +59,7 @@ const router = createBrowserRouter([
     Component: ProtectedLayout,
     children: [
       { index: true, Component: Dashboard },
-      { path: 'tables/:name', Component: TableView },
+      { path: 'tables/:name', Component: TableViewKeyed },
       { path: 'users', Component: UsersPage },
       { path: 'sql', Component: SqlRunner },
       { path: 'logs', Component: AuditLogs },
