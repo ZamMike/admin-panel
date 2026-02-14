@@ -12,29 +12,29 @@ export function RowDetail({ row, onClose, onEdit, onDelete }: Props) {
   if (!row) return null
 
   return (
-    <div className="fixed inset-y-0 right-0 w-96 bg-zinc-900 border-l border-zinc-800 shadow-2xl z-40 flex flex-col">
+    <div className="fixed inset-y-0 right-0 w-96 bg-surface border-l border-border shadow-2xl z-40 flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800">
-        <h3 className="font-medium text-zinc-100 text-sm">Row Detail</h3>
+      <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+        <h3 className="font-semibold text-zinc-100 text-sm">Row Detail</h3>
         <button
           onClick={onClose}
-          className="p-1 rounded hover:bg-zinc-800 text-zinc-400"
+          className="p-1.5 rounded-lg hover:bg-surface-hover text-zinc-500 transition-colors"
         >
           <X className="w-4 h-4" />
         </button>
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3">
+      <div className="flex-1 overflow-y-auto p-5 space-y-3">
         {Object.entries(row).map(([key, value]) => (
           <div key={key}>
-            <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider">
+            <label className="text-[10px] font-semibold text-zinc-600 uppercase tracking-wider">
               {key}
             </label>
             <div className={cn(
-              'mt-0.5 px-3 py-2 rounded-lg bg-zinc-800/50 border border-zinc-700/50',
+              'mt-1 px-3 py-2 rounded-lg bg-[#0a0a0b] border border-border',
               'text-sm text-zinc-200 break-all whitespace-pre-wrap',
-              value === null && 'text-zinc-600 italic'
+              value === null && 'text-zinc-700 italic'
             )}>
               {value === null ? 'null' : formatValue(value)}
             </div>
@@ -43,7 +43,7 @@ export function RowDetail({ row, onClose, onEdit, onDelete }: Props) {
       </div>
 
       {/* Actions */}
-      <div className="px-4 py-3 border-t border-zinc-800 flex gap-2">
+      <div className="px-5 py-4 border-t border-border flex gap-2">
         {onEdit && (
           <button
             onClick={() => onEdit(row)}
@@ -55,7 +55,7 @@ export function RowDetail({ row, onClose, onEdit, onDelete }: Props) {
         {onDelete && row.id != null && (
           <button
             onClick={() => onDelete(String(row.id))}
-            className="px-3 py-2 rounded-lg bg-red-900/50 hover:bg-red-900 text-red-300 text-sm font-medium border border-red-800/50 transition-colors"
+            className="px-3 py-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 text-sm font-medium border border-red-500/20 transition-colors"
           >
             Delete
           </button>

@@ -9,7 +9,7 @@ import {
 } from '@tanstack/react-table'
 import { api } from '@/lib/api'
 import type { TableInfo, TableResponse } from '@/lib/api'
-import { cn, truncate } from '@/lib/utils'
+import { cn, truncate, shortUuid, relativeTime } from '@/lib/utils'
 import { ArrowUpDown, ArrowUp, ArrowDown, Search, Loader2, ChevronLeft, ChevronRight } from 'lucide-react'
 
 type Props = {
@@ -21,6 +21,14 @@ type Props = {
 }
 
 const PAGE_SIZES = [25, 50, 100]
+
+function isUuid(val: unknown): boolean {
+  return typeof val === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-/.test(val)
+}
+
+function isTimestamp(type: string): boolean {
+  return type.includes('timestamp') || type === 'date'
+}
 
 export function DataTable({ tableName, schema, onRowClick, selectedIds, onSelectionChange }: Props) {
   const [data, setData] = useState<Record<string, unknown>[]>([])
@@ -63,7 +71,6 @@ export function DataTable({ tableName, schema, onRowClick, selectedIds, onSelect
     fetchData()
   }, [fetchData])
 
-  // Sync selection to parent
   useEffect(() => {
     if (!onSelectionChange) return
     const ids = new Set<string>()
@@ -74,7 +81,6 @@ export function DataTable({ tableName, schema, onRowClick, selectedIds, onSelect
     onSelectionChange(ids)
   }, [rowSelection, data, onSelectionChange])
 
-  // Sync from parent
   useEffect(() => {
     if (!selectedIds || selectedIds.size === 0) {
       setRowSelection({})
@@ -92,7 +98,7 @@ export function DataTable({ tableName, schema, onRowClick, selectedIds, onSelect
             type="checkbox"
             checked={table.getIsAllPageRowsSelected()}
             onChange={table.getToggleAllPageRowsSelectedHandler()}
-            className="accent-brand"
+            className="accent-brand rounded"
           />
         ),
         cell: ({ row }) => (
@@ -100,7 +106,7 @@ export function DataTable({ tableName, schema, onRowClick, selectedIds, onSelect
             type="checkbox"
             checked={row.getIsSelected()}
             onChange={row.getToggleSelectedHandler()}
-            className="accent-brand"
+            className="accent-brand rounded"
             onClick={(e) => e.stopPropagation()}
           />
         ),
@@ -117,17 +123,35 @@ export function DataTable({ tableName, schema, onRowClick, selectedIds, onSelect
         cell: ({ getValue }) => {
           const val = getValue()
           if (val === null || val === undefined) {
-            return <span className="text-zinc-600 italic">null</span>
+            return <span className="text-zinc-700 italic text-xs">null</span>
           }
           if (typeof val === 'boolean') {
-            return val ? '✓' : '✗'
+            return (
+              <span className={cn('text-xs font-medium', val ? 'text-emerald-400' : 'text-zinc-500')}>
+                {val ? 'true' : 'false'}
+              </span>
+            )
+          }
+          if (col.data_type === 'uuid' || isUuid(val)) {
+            return (
+              <span className="font-mono text-xs text-zinc-400" title={String(val)}>
+                {shortUuid(String(val))}
+              </span>
+            )
+          }
+          if (isTimestamp(col.data_type) && typeof val === 'string') {
+            return (
+              <span className="text-zinc-400 text-xs" title={String(val)}>
+                {relativeTime(val)}
+              </span>
+            )
           }
           if (typeof val === 'object') {
-            return <span className="text-zinc-400">{truncate(JSON.stringify(val), 60)}</span>
+            return <span className="text-zinc-500 font-mono text-xs">{truncate(JSON.stringify(val), 50)}</span>
           }
-          return <span>{truncate(String(val), 60)}</span>
+          return <span className="text-zinc-300">{truncate(String(val), 60)}</span>
         },
-        size: col.data_type === 'uuid' ? 120 : col.data_type.includes('timestamp') ? 160 : 150,
+        size: col.data_type === 'uuid' ? 100 : isTimestamp(col.data_type) ? 100 : 150,
       })
     }
 
@@ -154,7 +178,7 @@ export function DataTable({ tableName, schema, onRowClick, selectedIds, onSelect
       {/* Toolbar */}
       <div className="flex items-center gap-3 flex-wrap">
         <div className="relative flex-1 min-w-[200px] max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-600" />
           <input
             type="text"
             placeholder="Search all columns..."
@@ -164,16 +188,16 @@ export function DataTable({ tableName, schema, onRowClick, selectedIds, onSelect
               setPage(1)
             }}
             className={cn(
-              'w-full pl-9 pr-3 py-2 rounded-lg bg-zinc-900 border border-zinc-700',
-              'text-sm text-zinc-100 placeholder-zinc-500',
-              'focus:outline-none focus:border-brand focus:ring-1 focus:ring-brand'
+              'w-full pl-9 pr-3 py-2 rounded-lg bg-surface border border-border',
+              'text-sm text-zinc-100 placeholder-zinc-600',
+              'focus:outline-none focus:border-brand/50 focus:ring-1 focus:ring-brand/20'
             )}
           />
         </div>
 
-        <div className="flex items-center gap-1 text-sm text-zinc-400">
-          <span>{total.toLocaleString()} rows</span>
-          {loading && <Loader2 className="w-3.5 h-3.5 animate-spin ml-1" />}
+        <div className="flex items-center gap-1.5 text-sm text-zinc-500">
+          <span className="tabular-nums">{total.toLocaleString()} rows</span>
+          {loading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
         </div>
       </div>
 
@@ -194,9 +218,9 @@ export function DataTable({ tableName, schema, onRowClick, selectedIds, onSelect
                 setPage(1)
               }}
               className={cn(
-                'px-2 py-1 rounded text-xs bg-zinc-900 border border-zinc-800',
-                'text-zinc-300 placeholder-zinc-600 w-28',
-                'focus:outline-none focus:border-zinc-600'
+                'px-2 py-1 rounded-md text-xs bg-surface border border-border',
+                'text-zinc-300 placeholder-zinc-700 w-28',
+                'focus:outline-none focus:border-brand/40'
               )}
             />
           ))}
@@ -204,19 +228,19 @@ export function DataTable({ tableName, schema, onRowClick, selectedIds, onSelect
       )}
 
       {/* Table */}
-      <div className="border border-zinc-800 rounded-xl overflow-hidden">
+      <div className="border border-border rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm table-striped">
             <thead>
               {table.getHeaderGroups().map((headerGroup) => (
-                <tr key={headerGroup.id} className="bg-zinc-900/80 border-b border-zinc-800">
+                <tr key={headerGroup.id} className="bg-surface border-b border-border">
                   {headerGroup.headers.map((header) => (
                     <th
                       key={header.id}
                       className={cn(
-                        'px-3 py-2.5 text-left text-xs font-medium text-zinc-400 uppercase tracking-wider',
-                        'sticky top-0 bg-zinc-900/95 backdrop-blur-sm',
-                        header.column.getCanSort() && 'cursor-pointer select-none hover:text-zinc-200'
+                        'px-3 py-2.5 text-left text-[11px] font-semibold text-zinc-500 uppercase tracking-wider',
+                        'sticky top-0 bg-surface',
+                        header.column.getCanSort() && 'cursor-pointer select-none hover:text-zinc-300'
                       )}
                       style={{ width: header.getSize() }}
                       onClick={header.column.getToggleSortingHandler()}
@@ -225,11 +249,11 @@ export function DataTable({ tableName, schema, onRowClick, selectedIds, onSelect
                         {flexRender(header.column.columnDef.header, header.getContext())}
                         {header.column.getCanSort() && (
                           header.column.getIsSorted() === 'asc' ? (
-                            <ArrowUp className="w-3 h-3" />
+                            <ArrowUp className="w-3 h-3 text-brand" />
                           ) : header.column.getIsSorted() === 'desc' ? (
-                            <ArrowDown className="w-3 h-3" />
+                            <ArrowDown className="w-3 h-3 text-brand" />
                           ) : (
-                            <ArrowUpDown className="w-3 h-3 opacity-30" />
+                            <ArrowUpDown className="w-3 h-3 opacity-20" />
                           )
                         )}
                       </div>
@@ -244,13 +268,13 @@ export function DataTable({ tableName, schema, onRowClick, selectedIds, onSelect
                   key={row.id}
                   onClick={() => onRowClick?.(row.original)}
                   className={cn(
-                    'border-b border-zinc-800/50 transition-colors',
-                    'hover:bg-zinc-800/50 cursor-pointer',
+                    'border-b border-border/50 transition-colors',
+                    'hover:bg-surface-hover cursor-pointer',
                     row.getIsSelected() && 'bg-brand/5'
                   )}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <td key={cell.id} className="px-3 py-2 text-zinc-300 whitespace-nowrap">
+                    <td key={cell.id} className="px-3 py-2 whitespace-nowrap">
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </td>
                   ))}
@@ -258,8 +282,9 @@ export function DataTable({ tableName, schema, onRowClick, selectedIds, onSelect
               ))}
               {!loading && data.length === 0 && (
                 <tr>
-                  <td colSpan={columns.length} className="px-3 py-8 text-center text-zinc-500">
-                    No data found
+                  <td colSpan={columns.length} className="px-3 py-12 text-center text-zinc-600">
+                    <p className="text-sm">No data found</p>
+                    <p className="text-xs mt-1 text-zinc-700">Try adjusting your search or filters</p>
                   </td>
                 </tr>
               )}
@@ -271,14 +296,14 @@ export function DataTable({ tableName, schema, onRowClick, selectedIds, onSelect
       {/* Pagination */}
       <div className="flex items-center justify-between text-sm">
         <div className="flex items-center gap-2">
-          <span className="text-zinc-500">Rows per page:</span>
+          <span className="text-zinc-600 text-xs">Rows per page:</span>
           <select
             value={limit}
             onChange={(e) => {
               setLimit(Number(e.target.value))
               setPage(1)
             }}
-            className="bg-zinc-900 border border-zinc-700 rounded px-2 py-1 text-zinc-300 text-xs"
+            className="bg-surface border border-border rounded-md px-2 py-1 text-zinc-400 text-xs"
           >
             {PAGE_SIZES.map((s) => (
               <option key={s} value={s}>{s}</option>
@@ -287,20 +312,20 @@ export function DataTable({ tableName, schema, onRowClick, selectedIds, onSelect
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-zinc-400">
+          <span className="text-zinc-500 text-xs tabular-nums">
             Page {page} of {totalPages || 1}
           </span>
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page <= 1}
-            className="p-1.5 rounded hover:bg-zinc-800 disabled:opacity-30 disabled:cursor-not-allowed text-zinc-400"
+            className="p-1.5 rounded-md hover:bg-surface-hover disabled:opacity-20 disabled:cursor-not-allowed text-zinc-400"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
           <button
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page >= totalPages}
-            className="p-1.5 rounded hover:bg-zinc-800 disabled:opacity-30 disabled:cursor-not-allowed text-zinc-400"
+            className="p-1.5 rounded-md hover:bg-surface-hover disabled:opacity-20 disabled:cursor-not-allowed text-zinc-400"
           >
             <ChevronRight className="w-4 h-4" />
           </button>

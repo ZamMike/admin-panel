@@ -1,43 +1,46 @@
+import { useAuth } from '@/lib/auth'
 import { supabase } from '@/lib/supabase'
-import { LogOut, PanelLeftClose, PanelLeft } from 'lucide-react'
-import type { User } from '@supabase/supabase-js'
-import { cn } from '@/lib/utils'
+import { LogOut, Search } from 'lucide-react'
 
 type Props = {
-  user: User
-  sidebarCollapsed: boolean
-  onToggleSidebar: () => void
+  onOpenSearch: () => void
 }
 
-export function Header({ user, sidebarCollapsed, onToggleSidebar }: Props) {
+export function Header({ onOpenSearch }: Props) {
+  const { user } = useAuth()
+
   async function handleLogout() {
     await supabase.auth.signOut()
   }
 
+  const initial = (user?.email || 'A')[0].toUpperCase()
+
   return (
-    <header className="h-14 bg-zinc-900 border-b border-zinc-800 flex items-center justify-between px-4">
+    <header className="h-14 bg-[#0a0a0b] border-b border-border flex items-center justify-between px-5">
+      {/* Search trigger */}
       <button
-        onClick={onToggleSidebar}
-        className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition-colors"
+        onClick={onOpenSearch}
+        className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border-light bg-surface text-zinc-500 text-sm hover:border-zinc-600 transition-colors w-64"
       >
-        {sidebarCollapsed ? (
-          <PanelLeft className="w-4 h-4" />
-        ) : (
-          <PanelLeftClose className="w-4 h-4" />
-        )}
+        <Search className="w-3.5 h-3.5" />
+        <span className="flex-1 text-left">Search...</span>
+        <kbd className="px-1.5 py-0.5 rounded text-[10px] bg-[#0a0a0b] text-zinc-600 border border-border">
+          Ctrl K
+        </kbd>
       </button>
 
+      {/* User */}
       <div className="flex items-center gap-3">
-        <span className="text-sm text-zinc-400">{user.email}</span>
+        <span className="text-sm text-zinc-500">{user?.email}</span>
+        <div className="w-7 h-7 rounded-full bg-brand/15 flex items-center justify-center text-brand text-xs font-semibold">
+          {initial}
+        </div>
         <button
           onClick={handleLogout}
-          className={cn(
-            'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm',
-            'text-zinc-400 hover:text-red-400 hover:bg-zinc-800 transition-colors'
-          )}
+          className="p-2 rounded-lg text-zinc-500 hover:text-red-400 hover:bg-surface-hover transition-colors"
+          title="Logout"
         >
-          <LogOut className="w-3.5 h-3.5" />
-          Logout
+          <LogOut className="w-4 h-4" />
         </button>
       </div>
     </header>

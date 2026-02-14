@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
-import { ScrollText, Loader2 } from 'lucide-react'
+import { ScrollText, Loader2, ChevronDown } from 'lucide-react'
 import { api } from '@/lib/api'
 import { toast } from '@/components/ui/Toast'
-import { cn, formatDate } from '@/lib/utils'
+import { cn, relativeTime } from '@/lib/utils'
 
 type AuditEntry = {
   id: string
@@ -54,28 +54,30 @@ export function AuditLogs() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filterAction, filterTable])
 
-  const actionColor: Record<string, string> = {
-    INSERT: 'text-green-400 bg-green-900/30',
-    UPDATE: 'text-blue-400 bg-blue-900/30',
-    DELETE: 'text-red-400 bg-red-900/30',
+  const actionStyles: Record<string, { bg: string; text: string; dot: string }> = {
+    INSERT: { bg: 'bg-emerald-500/10', text: 'text-emerald-400', dot: 'bg-emerald-400' },
+    UPDATE: { bg: 'bg-brand/10', text: 'text-brand-light', dot: 'bg-brand' },
+    DELETE: { bg: 'bg-red-500/10', text: 'text-red-400', dot: 'bg-red-400' },
   }
 
   return (
     <div>
-      <div className="flex items-center gap-2 mb-6">
-        <ScrollText className="w-5 h-5 text-brand" />
-        <h1 className="text-xl font-semibold text-zinc-100">Audit Logs</h1>
-        <span className="text-xs text-zinc-500 bg-zinc-800 px-2 py-0.5 rounded">
-          {logs.length}
-        </span>
+      <div className="flex items-center gap-3 mb-6">
+        <div className="w-8 h-8 rounded-lg bg-brand/10 flex items-center justify-center">
+          <ScrollText className="w-4 h-4 text-brand" />
+        </div>
+        <div>
+          <h1 className="text-lg font-semibold text-zinc-100">Audit Logs</h1>
+          <span className="text-xs text-zinc-600">{logs.length} entries</span>
+        </div>
       </div>
 
       {/* Filters */}
-      <div className="flex gap-3 mb-4">
+      <div className="flex gap-3 mb-5">
         <select
           value={filterAction}
           onChange={(e) => setFilterAction(e.target.value)}
-          className="px-3 py-1.5 rounded-lg text-xs bg-zinc-900 border border-zinc-700 text-zinc-300"
+          className="px-3 py-1.5 rounded-lg text-xs bg-surface border border-border text-zinc-300"
         >
           <option value="">All actions</option>
           <option value="INSERT">INSERT</option>
@@ -87,71 +89,87 @@ export function AuditLogs() {
           placeholder="Filter by table..."
           value={filterTable}
           onChange={(e) => setFilterTable(e.target.value)}
-          className="px-3 py-1.5 rounded-lg text-xs bg-zinc-900 border border-zinc-700 text-zinc-300 placeholder-zinc-600 w-48 focus:outline-none focus:border-zinc-600"
+          className="px-3 py-1.5 rounded-lg text-xs bg-surface border border-border text-zinc-300 placeholder-zinc-700 w-48 focus:outline-none focus:border-brand/40"
         />
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center py-12">
-          <Loader2 className="w-6 h-6 animate-spin text-zinc-500" />
+        <div className="flex items-center justify-center py-16">
+          <Loader2 className="w-5 h-5 animate-spin text-zinc-600" />
         </div>
       ) : (
-        <div className="space-y-2">
-          {logs.map((log) => (
-            <div
-              key={log.id}
-              className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden"
-            >
-              <button
-                onClick={() => setExpanded(expanded === log.id ? null : log.id)}
-                className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-zinc-800/50 transition-colors"
-              >
-                <span className={cn(
-                  'px-2 py-0.5 rounded text-[10px] font-bold uppercase',
-                  actionColor[log.action] || 'text-zinc-400 bg-zinc-800'
-                )}>
-                  {log.action}
-                </span>
-                <span className="text-sm text-zinc-200 font-medium">
-                  {log.table_name}
-                </span>
-                {log.row_id && (
-                  <span className="text-xs text-zinc-500">#{log.row_id}</span>
-                )}
-                <span className="ml-auto text-xs text-zinc-500">
-                  {formatDate(log.created_at)}
-                </span>
-                <span className="text-xs text-zinc-600">{log.ip_address}</span>
-              </button>
+        <div className="space-y-1">
+          {logs.map((log) => {
+            const style = actionStyles[log.action] || { bg: 'bg-surface', text: 'text-zinc-400', dot: 'bg-zinc-500' }
+            const isOpen = expanded === log.id
 
-              {expanded === log.id && (
-                <div className="px-4 pb-3 border-t border-zinc-800 grid grid-cols-2 gap-3">
-                  {log.old_data && (
-                    <div>
-                      <p className="text-[10px] text-red-400 uppercase font-medium mt-2 mb-1">Old Data</p>
-                      <pre className="text-xs text-zinc-400 bg-zinc-800/50 p-2 rounded overflow-x-auto max-h-48">
-                        {JSON.stringify(log.old_data, null, 2)}
-                      </pre>
-                    </div>
+            return (
+              <div
+                key={log.id}
+                className="bg-surface border border-border rounded-xl overflow-hidden"
+              >
+                <button
+                  onClick={() => setExpanded(isOpen ? null : log.id)}
+                  className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-surface-hover transition-colors"
+                >
+                  {/* Timeline dot */}
+                  <div className={cn('w-2 h-2 rounded-full shrink-0', style.dot)} />
+
+                  {/* Action badge */}
+                  <span className={cn(
+                    'px-2 py-0.5 rounded-md text-[10px] font-bold uppercase',
+                    style.bg, style.text
+                  )}>
+                    {log.action}
+                  </span>
+
+                  {/* Table + row */}
+                  <span className="text-sm text-zinc-200 font-medium">{log.table_name}</span>
+                  {log.row_id && (
+                    <span className="text-xs text-zinc-600 font-mono">#{log.row_id.slice(0, 8)}</span>
                   )}
-                  {log.new_data && (
-                    <div>
-                      <p className="text-[10px] text-green-400 uppercase font-medium mt-2 mb-1">New Data</p>
-                      <pre className="text-xs text-zinc-400 bg-zinc-800/50 p-2 rounded overflow-x-auto max-h-48">
-                        {JSON.stringify(log.new_data, null, 2)}
-                      </pre>
-                    </div>
+
+                  {/* Time + IP */}
+                  <span className="ml-auto text-[11px] text-zinc-600">{relativeTime(log.created_at)}</span>
+                  {log.ip_address && (
+                    <span className="text-[10px] text-zinc-700 font-mono">{log.ip_address}</span>
                   )}
-                </div>
-              )}
-            </div>
-          ))}
+
+                  <ChevronDown className={cn(
+                    'w-3.5 h-3.5 text-zinc-600 transition-transform',
+                    isOpen && 'rotate-180'
+                  )} />
+                </button>
+
+                {isOpen && (
+                  <div className="px-4 pb-4 border-t border-border grid grid-cols-2 gap-3">
+                    {log.old_data && (
+                      <div>
+                        <p className="text-[10px] text-red-400 uppercase font-semibold mt-3 mb-1.5">Old Data</p>
+                        <pre className="text-xs text-zinc-400 bg-[#0a0a0b] border border-border p-3 rounded-lg overflow-x-auto max-h-48 font-mono">
+                          {JSON.stringify(log.old_data, null, 2)}
+                        </pre>
+                      </div>
+                    )}
+                    {log.new_data && (
+                      <div>
+                        <p className="text-[10px] text-emerald-400 uppercase font-semibold mt-3 mb-1.5">New Data</p>
+                        <pre className="text-xs text-zinc-400 bg-[#0a0a0b] border border-border p-3 rounded-lg overflow-x-auto max-h-48 font-mono">
+                          {JSON.stringify(log.new_data, null, 2)}
+                        </pre>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )
+          })}
 
           {logs.length === 0 && (
-            <div className="text-center py-12 text-zinc-500">
-              <ScrollText className="w-12 h-12 mx-auto mb-3 opacity-30" />
-              <p>No audit logs yet</p>
-              <p className="text-xs mt-1">Logs will appear after CRUD operations</p>
+            <div className="text-center py-16 text-zinc-600">
+              <ScrollText className="w-12 h-12 mx-auto mb-4 opacity-20" />
+              <p className="text-sm font-medium">No audit logs yet</p>
+              <p className="text-xs mt-1 text-zinc-700">Logs will appear after CRUD operations</p>
             </div>
           )}
         </div>

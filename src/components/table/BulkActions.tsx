@@ -34,8 +34,8 @@ export function BulkActions({ tableName, selectedIds, onClear, onDone }: Props) 
   }
 
   return (
-    <div className="flex items-center gap-3 px-4 py-2.5 bg-zinc-800/80 border border-zinc-700 rounded-xl">
-      <span className="text-sm text-zinc-300">
+    <div className="flex items-center gap-3 px-4 py-2.5 mb-3 bg-surface border border-border rounded-xl">
+      <span className="text-sm text-zinc-300 tabular-nums">
         {selectedIds.size} selected
       </span>
 
@@ -47,7 +47,7 @@ export function BulkActions({ tableName, selectedIds, onClear, onDone }: Props) 
             disabled={deleting}
             className={cn(
               'flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium',
-              'bg-red-600 hover:bg-red-700 text-white transition-colors',
+              'bg-red-500 hover:bg-red-600 text-white transition-colors',
               'disabled:opacity-50'
             )}
           >
@@ -55,7 +55,7 @@ export function BulkActions({ tableName, selectedIds, onClear, onDone }: Props) 
           </button>
           <button
             onClick={() => setConfirming(false)}
-            className="p-1 rounded hover:bg-zinc-700 text-zinc-400"
+            className="p-1 rounded-md hover:bg-surface-hover text-zinc-500"
           >
             <X className="w-3.5 h-3.5" />
           </button>
@@ -63,7 +63,7 @@ export function BulkActions({ tableName, selectedIds, onClear, onDone }: Props) 
       ) : (
         <button
           onClick={() => setConfirming(true)}
-          className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium text-red-400 hover:bg-red-900/30 border border-red-800/40 transition-colors"
+          className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium text-red-400 hover:bg-red-500/10 border border-red-500/20 transition-colors"
         >
           <Trash2 className="w-3 h-3" />
           Delete
@@ -72,7 +72,7 @@ export function BulkActions({ tableName, selectedIds, onClear, onDone }: Props) 
 
       <button
         onClick={onClear}
-        className="ml-auto text-xs text-zinc-500 hover:text-zinc-300"
+        className="ml-auto text-xs text-zinc-600 hover:text-zinc-400 transition-colors"
       >
         Clear
       </button>

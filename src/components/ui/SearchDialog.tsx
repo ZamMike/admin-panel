@@ -35,7 +35,6 @@ export function SearchDialog({ open, onClose, onNavigate }: Props) {
       setQuery('')
       setSelectedIndex(0)
       inputRef.current?.focus()
-      // Load tables
       api.getTables().then(setTables).catch(() => {})
     }
   }, [open])
@@ -80,12 +79,12 @@ export function SearchDialog({ open, onClose, onNavigate }: Props) {
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center pt-[20vh] bg-black/60 backdrop-blur-sm" onClick={onClose}>
       <div
-        className="w-full max-w-lg bg-zinc-900 border border-zinc-700 rounded-xl shadow-2xl overflow-hidden"
+        className="w-full max-w-lg bg-surface border border-border rounded-xl shadow-2xl overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Search input */}
-        <div className="flex items-center gap-3 px-4 py-3 border-b border-zinc-800">
-          <Search className="w-4 h-4 text-zinc-500 shrink-0" />
+        <div className="flex items-center gap-3 px-4 py-3 border-b border-border">
+          <Search className="w-4 h-4 text-zinc-600 shrink-0" />
           <input
             ref={inputRef}
             type="text"
@@ -93,9 +92,9 @@ export function SearchDialog({ open, onClose, onNavigate }: Props) {
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Search tables, pages..."
-            className="flex-1 bg-transparent text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none"
+            className="flex-1 bg-transparent text-sm text-zinc-100 placeholder-zinc-600 focus:outline-none"
           />
-          <kbd className="px-1.5 py-0.5 rounded text-[10px] bg-zinc-800 text-zinc-500 border border-zinc-700">
+          <kbd className="px-1.5 py-0.5 rounded text-[10px] bg-[#0a0a0b] text-zinc-600 border border-border">
             ESC
           </kbd>
         </div>
@@ -111,18 +110,18 @@ export function SearchDialog({ open, onClose, onNavigate }: Props) {
                 className={cn(
                   'w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors',
                   i === selectedIndex
-                    ? 'bg-brand/10 text-brand'
-                    : 'text-zinc-300 hover:bg-zinc-800'
+                    ? 'bg-brand/10 text-brand-light'
+                    : 'text-zinc-400 hover:bg-surface-hover'
                 )}
               >
                 <Icon className="w-4 h-4 shrink-0" />
                 <span>{item.label}</span>
-                <span className="ml-auto text-xs text-zinc-600">{item.type}</span>
+                <span className="ml-auto text-[10px] text-zinc-700 uppercase">{item.type}</span>
               </button>
             )
           })}
           {filtered.length === 0 && (
-            <p className="px-4 py-3 text-sm text-zinc-500 text-center">No results</p>
+            <p className="px-4 py-6 text-sm text-zinc-600 text-center">No results</p>
           )}
         </div>
       </div>

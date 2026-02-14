@@ -63,22 +63,24 @@ export function TableView() {
   return (
     <div className={cn('transition-all', selectedRow ? 'mr-96' : '')}>
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <Table2 className="w-5 h-5 text-brand" />
-          <h1 className="text-xl font-semibold text-zinc-100">{name}</h1>
-          {schema && (
-            <span className="text-xs text-zinc-500 bg-zinc-800 px-2 py-0.5 rounded">
-              {schema.columns.length} cols
-            </span>
-          )}
+      <div className="flex items-center justify-between mb-5">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-brand/10 flex items-center justify-center">
+            <Table2 className="w-4 h-4 text-brand" />
+          </div>
+          <div>
+            <h1 className="text-lg font-semibold text-zinc-100">{name}</h1>
+            {schema && (
+              <span className="text-xs text-zinc-600">{schema.columns.length} columns</span>
+            )}
+          </div>
         </div>
 
         <div className="flex items-center gap-2">
           <button
             onClick={() => handleExport('csv')}
             disabled={exporting}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs text-zinc-400 hover:bg-zinc-800 border border-zinc-700 transition-colors disabled:opacity-50"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-zinc-400 hover:text-zinc-200 hover:bg-surface-hover border border-border transition-colors disabled:opacity-50"
           >
             <Download className="w-3.5 h-3.5" />
             CSV
@@ -86,7 +88,7 @@ export function TableView() {
           <button
             onClick={() => handleExport('json')}
             disabled={exporting}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs text-zinc-400 hover:bg-zinc-800 border border-zinc-700 transition-colors disabled:opacity-50"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs text-zinc-400 hover:text-zinc-200 hover:bg-surface-hover border border-border transition-colors disabled:opacity-50"
           >
             <Download className="w-3.5 h-3.5" />
             JSON
@@ -94,7 +96,7 @@ export function TableView() {
           <button
             onClick={() => setEditRow('new')}
             className={cn(
-              'flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium',
+              'flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium',
               'bg-brand hover:bg-brand-dark text-white transition-colors'
             )}
           >
