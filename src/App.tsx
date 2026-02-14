@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react'
-import { BrowserRouter, Navigate, useLocation, useNavigate } from 'react-router-dom'
+import { useState, useEffect, useCallback } from 'react'
 import { AuthProvider, useAuth } from '@/lib/auth'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { Header } from '@/components/layout/Header'
@@ -17,7 +16,6 @@ import type { TableInfo } from '@/lib/api'
 
 function Shell() {
   const { user, loading } = useAuth()
-  const location = useLocation()
 
   if (loading) {
     return (
@@ -27,27 +25,33 @@ function Shell() {
     )
   }
 
-  // Not logged in → show login (or redirect to /login)
-  if (!user) {
-    if (location.pathname !== '/login') return <Navigate to="/login" replace />
-    return <Login />
-  }
-
-  // Logged in but on /login → redirect home
-  if (location.pathname === '/login') return <Navigate to="/" replace />
+  if (!user) return <Login />
 
   return <AuthenticatedApp />
 }
 
 function AuthenticatedApp() {
-  const location = useLocation()
-  const navigate = useNavigate()
+  const [path, setPath] = useState(window.location.pathname)
   const [tables, setTables] = useState<TableInfo[]>([])
   const [collapsed, setCollapsed] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
 
   useSessionTimeout()
 
+  // Custom navigate — pushState + setState
+  const navigate = useCallback((to: string) => {
+    window.history.pushState(null, '', to)
+    setPath(to)
+  }, [])
+
+  // Browser back/forward
+  useEffect(() => {
+    const onPopState = () => setPath(window.location.pathname)
+    window.addEventListener('popstate', onPopState)
+    return () => window.removeEventListener('popstate', onPopState)
+  }, [])
+
+  // Fetch tables
   useEffect(() => {
     api.getTables().then(setTables).catch(console.error)
   }, [])
@@ -65,21 +69,21 @@ function AuthenticatedApp() {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [])
 
-  // Manual route matching — no Outlet, no useParams
-  const tableMatch = location.pathname.match(/^\/tables\/(.+)$/)
+  // Route matching — pure string matching, no router
+  const tableMatch = path.match(/^\/tables\/(.+)$/)
 
   let page: React.ReactNode
   if (tableMatch) {
     const tableName = decodeURIComponent(tableMatch[1])
     page = <TableView tableName={tableName} tables={tables} key={tableName} />
-  } else if (location.pathname === '/users') {
+  } else if (path === '/users') {
     page = <UsersPage />
-  } else if (location.pathname === '/sql') {
+  } else if (path === '/sql') {
     page = <SqlRunner />
-  } else if (location.pathname === '/logs') {
+  } else if (path === '/logs') {
     page = <AuditLogs />
   } else {
-    page = <Dashboard />
+    page = <Dashboard tables={tables} onNavigate={navigate} />
   }
 
   return (
@@ -88,6 +92,8 @@ function AuthenticatedApp() {
         tables={tables}
         collapsed={collapsed}
         onToggle={() => setCollapsed(!collapsed)}
+        currentPath={path}
+        onNavigate={navigate}
       />
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header onOpenSearch={() => setSearchOpen(true)} />
@@ -99,8 +105,8 @@ function AuthenticatedApp() {
       <SearchDialog
         open={searchOpen}
         onClose={() => setSearchOpen(false)}
-        onNavigate={(path) => {
-          navigate(path)
+        onNavigate={(p) => {
+          navigate(p)
           setSearchOpen(false)
         }}
       />
@@ -111,9 +117,7 @@ function AuthenticatedApp() {
 export default function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <Shell />
-      </BrowserRouter>
+      <Shell />
     </AuthProvider>
   )
 }

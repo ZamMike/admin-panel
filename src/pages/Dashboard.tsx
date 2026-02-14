@@ -1,9 +1,13 @@
 import { useState, useEffect } from 'react'
-import { useOutletContext, Link } from 'react-router-dom'
 import { Database, Table2, Rows3, Loader2, ArrowRight } from 'lucide-react'
 import { api } from '@/lib/api'
 import { cn } from '@/lib/utils'
 import type { TableInfo } from '@/lib/api'
+
+type Props = {
+  tables: TableInfo[]
+  onNavigate: (path: string) => void
+}
 
 function StatCard({ icon: Icon, label, value, loading, accent }: {
   icon: typeof Database
@@ -29,8 +33,7 @@ function StatCard({ icon: Icon, label, value, loading, accent }: {
   )
 }
 
-export function Dashboard() {
-  const { tables } = useOutletContext<{ tables: TableInfo[] }>()
+export function Dashboard({ tables, onNavigate }: Props) {
   const [rowCounts, setRowCounts] = useState<Record<string, number>>({})
   const [loading, setLoading] = useState(true)
 
@@ -92,11 +95,11 @@ export function Dashboard() {
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
         {tables.map((t) => (
-          <Link
+          <button
             key={t.table_name}
-            to={`/tables/${t.table_name}`}
+            onClick={() => onNavigate(`/tables/${t.table_name}`)}
             className={cn(
-              'bg-surface border border-border rounded-xl p-4',
+              'bg-surface border border-border rounded-xl p-4 text-left',
               'hover:border-brand/30 hover:bg-surface-hover transition-all group'
             )}
           >
@@ -119,7 +122,7 @@ export function Dashboard() {
                 )}
               </span>
             </div>
-          </Link>
+          </button>
         ))}
       </div>
 

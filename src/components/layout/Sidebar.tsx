@@ -1,4 +1,3 @@
-import { useNavigate, useLocation } from 'react-router-dom'
 import { cn } from '@/lib/utils'
 import {
   LayoutDashboard,
@@ -16,6 +15,8 @@ type Props = {
   tables: TableInfo[]
   collapsed: boolean
   onToggle: () => void
+  currentPath: string
+  onNavigate: (path: string) => void
 }
 
 const mainNav = [
@@ -25,17 +26,9 @@ const mainNav = [
   { to: '/sql', icon: Terminal, label: 'SQL Runner' },
 ]
 
-export function Sidebar({ tables, collapsed, onToggle }: Props) {
-  const navigate = useNavigate()
-  const { pathname } = useLocation()
-
-  function go(path: string) {
-    console.log('[NAV] navigate to:', path, '| current:', pathname)
-    navigate(path)
-  }
-
+export function Sidebar({ tables, collapsed, onToggle, currentPath, onNavigate }: Props) {
   function isActive(path: string, exact = false) {
-    return exact ? pathname === path : pathname.startsWith(path)
+    return exact ? currentPath === path : currentPath.startsWith(path)
   }
 
   return (
@@ -80,11 +73,11 @@ export function Sidebar({ tables, collapsed, onToggle }: Props) {
         )}
         <div className="px-2 space-y-0.5">
           {mainNav.map(({ to, icon: Icon, label }) => {
-            const active = to === '/' ? pathname === '/' : pathname.startsWith(to)
+            const active = to === '/' ? currentPath === '/' : currentPath.startsWith(to)
             return (
               <button
                 key={to}
-                onClick={() => go(to)}
+                onClick={() => onNavigate(to)}
                 className={cn(
                   'w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium transition-all text-left',
                   active
@@ -119,7 +112,7 @@ export function Sidebar({ tables, collapsed, onToggle }: Props) {
                 return (
                   <button
                     key={t.table_name}
-                    onClick={() => go(path)}
+                    onClick={() => onNavigate(path)}
                     className={cn(
                       'w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-[13px] transition-all text-left',
                       active
