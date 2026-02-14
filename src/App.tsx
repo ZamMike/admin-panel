@@ -7,6 +7,7 @@ import { Dashboard } from '@/pages/Dashboard'
 import { TableView } from '@/pages/TableView'
 import { UsersPage } from '@/pages/Users'
 import { SqlRunner } from '@/pages/SqlRunner'
+import { ToastContainer } from '@/components/ui/Toast'
 import type { User } from '@supabase/supabase-js'
 
 export default function App() {
@@ -39,6 +40,7 @@ export default function App() {
 
   return (
     <BrowserRouter>
+      <ToastContainer />
       <Routes>
         <Route
           path="/login"
