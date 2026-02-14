@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { cn } from '@/lib/utils'
 import {
   LayoutDashboard,
@@ -26,6 +26,17 @@ const mainNav = [
 ]
 
 export function Sidebar({ tables, collapsed, onToggle }: Props) {
+  const navigate = useNavigate()
+  const { pathname } = useLocation()
+
+  function go(path: string) {
+    navigate(path)
+  }
+
+  function isActive(path: string, exact = false) {
+    return exact ? pathname === path : pathname.startsWith(path)
+  }
+
   return (
     <aside
       className={cn(
@@ -67,24 +78,24 @@ export function Sidebar({ tables, collapsed, onToggle }: Props) {
           </div>
         )}
         <div className="px-2 space-y-0.5">
-          {mainNav.map(({ to, icon: Icon, label }) => (
-            <NavLink
-              key={to}
-              to={to}
-              end={to === '/'}
-              className={({ isActive }) =>
-                cn(
-                  'flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium transition-all',
-                  isActive
+          {mainNav.map(({ to, icon: Icon, label }) => {
+            const active = to === '/' ? pathname === '/' : pathname.startsWith(to)
+            return (
+              <button
+                key={to}
+                onClick={() => go(to)}
+                className={cn(
+                  'w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium transition-all text-left',
+                  active
                     ? 'bg-brand/10 text-brand-light'
                     : 'text-zinc-500 hover:text-zinc-200 hover:bg-surface-hover'
-                )
-              }
-            >
-              <Icon className="w-4 h-4 shrink-0" />
-              {!collapsed && label}
-            </NavLink>
-          ))}
+                )}
+              >
+                <Icon className="w-4 h-4 shrink-0" />
+                {!collapsed && label}
+              </button>
+            )
+          })}
         </div>
 
         {/* Tables section */}
@@ -101,25 +112,27 @@ export function Sidebar({ tables, collapsed, onToggle }: Props) {
               </div>
             )}
             <div className="px-2 space-y-0.5">
-              {tables.map((t) => (
-                <NavLink
-                  key={t.table_name}
-                  to={`/tables/${t.table_name}`}
-                  className={({ isActive }) =>
-                    cn(
-                      'flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-[13px] transition-all',
-                      isActive
+              {tables.map((t) => {
+                const path = `/tables/${t.table_name}`
+                const active = isActive(path)
+                return (
+                  <button
+                    key={t.table_name}
+                    onClick={() => go(path)}
+                    className={cn(
+                      'w-full flex items-center gap-2.5 px-3 py-1.5 rounded-lg text-[13px] transition-all text-left',
+                      active
                         ? 'bg-brand/10 text-brand-light'
                         : 'text-zinc-500 hover:text-zinc-200 hover:bg-surface-hover'
-                    )
-                  }
-                >
-                  <Table2 className="w-3.5 h-3.5 shrink-0" />
-                  {!collapsed && (
-                    <span className="truncate">{t.table_name}</span>
-                  )}
-                </NavLink>
-              ))}
+                    )}
+                  >
+                    <Table2 className="w-3.5 h-3.5 shrink-0" />
+                    {!collapsed && (
+                      <span className="truncate">{t.table_name}</span>
+                    )}
+                  </button>
+                )
+              })}
             </div>
           </div>
         )}
