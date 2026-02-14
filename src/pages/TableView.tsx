@@ -1,5 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
-import { useParams, useOutletContext } from 'react-router-dom'
+import { useState, useCallback } from 'react'
 import { Table2, Plus, Download } from 'lucide-react'
 import { DataTable } from '@/components/table/DataTable'
 import { RowDetail } from '@/components/table/RowDetail'
@@ -11,10 +10,13 @@ import { exportCSV, exportJSON } from '@/lib/export'
 import { cn } from '@/lib/utils'
 import type { TableInfo } from '@/lib/api'
 
-export function TableView() {
-  const { name } = useParams<{ name: string }>()
-  const { tables } = useOutletContext<{ tables: TableInfo[] }>()
-  const schema = tables.find((t) => t.table_name === name)
+type Props = {
+  tableName: string
+  tables: TableInfo[]
+}
+
+export function TableView({ tableName, tables }: Props) {
+  const schema = tables.find((t) => t.table_name === tableName)
 
   const [selectedRow, setSelectedRow] = useState<Record<string, unknown> | null>(null)
   const [editRow, setEditRow] = useState<Record<string, unknown> | null | 'new'>(null)
@@ -23,19 +25,10 @@ export function TableView() {
 
   const refresh = useCallback(() => setRefreshKey((k) => k + 1), [])
 
-  // Reset state when switching between tables
-  useEffect(() => {
-    setSelectedRow(null)
-    setEditRow(null)
-    setSelectedIds(new Set())
-    setRefreshKey(0)
-  }, [name])
-
   async function handleDelete(id: string) {
-    if (!name) return
     if (!confirm(`Delete row #${id}?`)) return
     try {
-      await api.deleteRows(name, [id])
+      await api.deleteRows(tableName, [id])
       toast('Row deleted', 'success')
       setSelectedRow(null)
       refresh()
@@ -48,14 +41,13 @@ export function TableView() {
   const [exporting, setExporting] = useState(false)
 
   async function handleExport(format: 'csv' | 'json') {
-    if (!name) return
     setExporting(true)
     try {
-      const result = await api.getTableData(name, { limit: 100, page: 1 })
+      const result = await api.getTableData(tableName, { limit: 100, page: 1 })
       if (format === 'csv') {
-        exportCSV(result.data, name)
+        exportCSV(result.data, tableName)
       } else {
-        exportJSON(result.data, name)
+        exportJSON(result.data, tableName)
       }
       toast(`Exported ${result.data.length} rows as ${format.toUpperCase()}`, 'success')
     } catch (e: unknown) {
@@ -66,8 +58,6 @@ export function TableView() {
     }
   }
 
-  if (!name) return null
-
   return (
     <div className={cn('transition-all', selectedRow ? 'mr-96' : '')}>
       {/* Header */}
@@ -77,7 +67,7 @@ export function TableView() {
             <Table2 className="w-4 h-4 text-brand" />
           </div>
           <div>
-            <h1 className="text-lg font-semibold text-zinc-100">{name}</h1>
+            <h1 className="text-lg font-semibold text-zinc-100">{tableName}</h1>
             {schema && (
               <span className="text-xs text-zinc-600">{schema.columns.length} columns</span>
             )}
@@ -116,7 +106,7 @@ export function TableView() {
 
       {/* Bulk actions */}
       <BulkActions
-        tableName={name}
+        tableName={tableName}
         selectedIds={selectedIds}
         onClear={() => setSelectedIds(new Set())}
         onDone={refresh}
@@ -124,8 +114,8 @@ export function TableView() {
 
       {/* Data table */}
       <DataTable
-        key={`${name}-${refreshKey}`}
-        tableName={name}
+        key={`${tableName}-${refreshKey}`}
+        tableName={tableName}
         schema={schema}
         onRowClick={setSelectedRow}
         selectedIds={selectedIds}
@@ -146,7 +136,7 @@ export function TableView() {
       {/* Edit/Create modal */}
       {editRow !== null && (
         <EditModal
-          tableName={name}
+          tableName={tableName}
           schema={schema}
           row={editRow === 'new' ? null : editRow}
           onClose={() => setEditRow(null)}
