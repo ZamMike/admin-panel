@@ -28,7 +28,7 @@ const icons = {
 const styles = {
   success: 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20',
   error: 'bg-red-500/10 text-red-300 border-red-500/20',
-  info: 'bg-surface text-zinc-200 border-border-light',
+  info: 'bg-surface text-[var(--th-text)] border-border-light',
 }
 
 export function ToastContainer() {

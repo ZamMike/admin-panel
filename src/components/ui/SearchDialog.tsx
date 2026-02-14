@@ -84,7 +84,7 @@ export function SearchDialog({ open, onClose, onNavigate }: Props) {
       >
         {/* Search input */}
         <div className="flex items-center gap-3 px-4 py-3 border-b border-border">
-          <Search className="w-4 h-4 text-zinc-600 shrink-0" />
+          <Search className="w-4 h-4 text-[var(--th-text-muted)] shrink-0" />
           <input
             ref={inputRef}
             type="text"
@@ -92,9 +92,9 @@ export function SearchDialog({ open, onClose, onNavigate }: Props) {
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Search tables, pages..."
-            className="flex-1 bg-transparent text-sm text-zinc-100 placeholder-zinc-600 focus:outline-none"
+            className="flex-1 bg-transparent text-sm text-[var(--th-text)] placeholder-[var(--th-text-muted)] focus:outline-none"
           />
-          <kbd className="px-1.5 py-0.5 rounded text-[10px] bg-[#0a0a0b] text-zinc-600 border border-border">
+          <kbd className="px-1.5 py-0.5 rounded text-[10px] text-[var(--th-text-muted)] border border-border" style={{ background: 'var(--th-bg)' }}>
             ESC
           </kbd>
         </div>
@@ -111,17 +111,17 @@ export function SearchDialog({ open, onClose, onNavigate }: Props) {
                   'w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors',
                   i === selectedIndex
                     ? 'bg-brand/10 text-brand-light'
-                    : 'text-zinc-400 hover:bg-surface-hover'
+                    : 'text-[var(--th-text-secondary)] hover:bg-surface-hover'
                 )}
               >
                 <Icon className="w-4 h-4 shrink-0" />
                 <span>{item.label}</span>
-                <span className="ml-auto text-[10px] text-zinc-700 uppercase">{item.type}</span>
+                <span className="ml-auto text-[10px] text-[var(--th-text-muted)] uppercase">{item.type}</span>
               </button>
             )
           })}
           {filtered.length === 0 && (
-            <p className="px-4 py-6 text-sm text-zinc-600 text-center">No results</p>
+            <p className="px-4 py-6 text-sm text-[var(--th-text-muted)] text-center">No results</p>
           )}
         </div>
       </div>

@@ -22,12 +22,12 @@ function StatCard({ icon: Icon, label, value, loading, accent }: {
         <div className={cn('w-8 h-8 rounded-lg flex items-center justify-center', accent)}>
           <Icon className="w-4 h-4" />
         </div>
-        <span className="text-xs font-medium text-zinc-500 uppercase tracking-wider">{label}</span>
+        <span className="text-xs font-medium text-[var(--th-text-secondary)] uppercase tracking-wider">{label}</span>
       </div>
       {loading ? (
         <div className="skeleton h-8 w-20" />
       ) : (
-        <p className="text-2xl font-bold text-zinc-100 tabular-nums">{value}</p>
+        <p className="text-2xl font-bold text-[var(--th-text)] tabular-nums">{value}</p>
       )}
     </div>
   )
@@ -58,8 +58,8 @@ export function Dashboard({ tables, onNavigate }: Props) {
     <div>
       {/* Welcome header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-zinc-100">Dashboard</h1>
-        <p className="text-sm text-zinc-500 mt-1">
+        <h1 className="text-2xl font-bold text-[var(--th-text)]">Dashboard</h1>
+        <p className="text-sm text-[var(--th-text-secondary)] mt-1">
           Overview of your Supabase database
         </p>
       </div>
@@ -91,7 +91,7 @@ export function Dashboard({ tables, onNavigate }: Props) {
 
       {/* Table cards */}
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-sm font-semibold text-zinc-400">All Tables</h2>
+        <h2 className="text-sm font-semibold text-[var(--th-text-secondary)]">All Tables</h2>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
         {tables.map((t) => (
@@ -106,15 +106,15 @@ export function Dashboard({ tables, onNavigate }: Props) {
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <Table2 className="w-4 h-4 text-brand/60" />
-                <span className="font-medium text-zinc-200 text-sm group-hover:text-brand-light transition-colors">
+                <span className="font-medium text-[var(--th-text)] text-sm group-hover:text-brand-light transition-colors">
                   {t.table_name}
                 </span>
               </div>
-              <ArrowRight className="w-3.5 h-3.5 text-zinc-700 group-hover:text-brand/60 transition-colors" />
+              <ArrowRight className="w-3.5 h-3.5 text-[var(--th-text-muted)] group-hover:text-brand/60 transition-colors" />
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-xs text-zinc-600">{t.columns.length} columns</span>
-              <span className="text-xs font-medium text-zinc-400 tabular-nums">
+              <span className="text-xs text-[var(--th-text-muted)]">{t.columns.length} columns</span>
+              <span className="text-xs font-medium text-[var(--th-text-secondary)] tabular-nums">
                 {loading ? (
                   <Loader2 className="w-3 h-3 animate-spin" />
                 ) : (
@@ -127,10 +127,10 @@ export function Dashboard({ tables, onNavigate }: Props) {
       </div>
 
       {tables.length === 0 && (
-        <div className="text-center py-16 text-zinc-600">
+        <div className="text-center py-16 text-[var(--th-text-muted)]">
           <Database className="w-12 h-12 mx-auto mb-4 opacity-20" />
           <p className="text-sm font-medium">No tables found</p>
-          <p className="text-xs mt-1 text-zinc-700">
+          <p className="text-xs mt-1 text-[var(--th-text-muted)]">
             Make sure get_table_info() RPC exists in Supabase
           </p>
         </div>

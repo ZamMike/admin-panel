@@ -61,14 +61,14 @@ export function UsersPage() {
           <UsersIcon className="w-4 h-4 text-brand" />
         </div>
         <div>
-          <h1 className="text-lg font-semibold text-zinc-100">Users</h1>
-          <span className="text-xs text-zinc-600">{users.length} total</span>
+          <h1 className="text-lg font-semibold text-[var(--th-text)]">Users</h1>
+          <span className="text-xs text-[var(--th-text-muted)]">{users.length} total</span>
         </div>
       </div>
 
       {loading ? (
         <div className="flex items-center justify-center py-16">
-          <Loader2 className="w-5 h-5 animate-spin text-zinc-600" />
+          <Loader2 className="w-5 h-5 animate-spin text-[var(--th-text-muted)]" />
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
@@ -83,22 +83,22 @@ export function UsersPage() {
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <span className="font-medium text-zinc-100 text-sm truncate">
+                    <span className="font-medium text-[var(--th-text)] text-sm truncate">
                       {user.display_name || user.email}
                     </span>
                   </div>
-                  <span className="text-xs text-zinc-600 block truncate">{user.email}</span>
+                  <span className="text-xs text-[var(--th-text-muted)] block truncate">{user.email}</span>
                 </div>
                 <span className={cn(
                   'px-2 py-0.5 rounded-md text-[10px] font-semibold uppercase border shrink-0',
-                  statusStyles[user.status] || 'text-zinc-400 bg-surface-hover'
+                  statusStyles[user.status] || 'text-[var(--th-text-secondary)] bg-surface-hover'
                 )}>
                   {user.status}
                 </span>
               </div>
 
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3 text-[11px] text-zinc-600">
+                <div className="flex items-center gap-3 text-[11px] text-[var(--th-text-muted)]">
                   <span>{user.provider}</span>
                   <span>{relativeTime(user.created_at)}</span>
                 </div>
@@ -125,7 +125,7 @@ export function UsersPage() {
           ))}
 
           {users.length === 0 && (
-            <div className="col-span-full text-center py-16 text-zinc-600">
+            <div className="col-span-full text-center py-16 text-[var(--th-text-muted)]">
               <UsersIcon className="w-12 h-12 mx-auto mb-4 opacity-20" />
               <p className="text-sm font-medium">No users found</p>
             </div>

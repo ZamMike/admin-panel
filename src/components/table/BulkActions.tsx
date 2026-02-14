@@ -35,7 +35,7 @@ export function BulkActions({ tableName, selectedIds, onClear, onDone }: Props) 
 
   return (
     <div className="flex items-center gap-3 px-4 py-2.5 mb-3 bg-surface border border-border rounded-xl">
-      <span className="text-sm text-zinc-300 tabular-nums">
+      <span className="text-sm text-[var(--th-text)] tabular-nums">
         {selectedIds.size} selected
       </span>
 
@@ -55,7 +55,7 @@ export function BulkActions({ tableName, selectedIds, onClear, onDone }: Props) 
           </button>
           <button
             onClick={() => setConfirming(false)}
-            className="p-1 rounded-md hover:bg-surface-hover text-zinc-500"
+            className="p-1 rounded-md hover:bg-surface-hover text-[var(--th-text-secondary)]"
           >
             <X className="w-3.5 h-3.5" />
           </button>
@@ -72,7 +72,7 @@ export function BulkActions({ tableName, selectedIds, onClear, onDone }: Props) 
 
       <button
         onClick={onClear}
-        className="ml-auto text-xs text-zinc-600 hover:text-zinc-400 transition-colors"
+        className="ml-auto text-xs text-[var(--th-text-muted)] hover:text-[var(--th-text-secondary)] transition-colors"
       >
         Clear
       </button>

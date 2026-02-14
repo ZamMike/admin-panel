@@ -67,8 +67,8 @@ export function AuditLogs() {
           <ScrollText className="w-4 h-4 text-brand" />
         </div>
         <div>
-          <h1 className="text-lg font-semibold text-zinc-100">Audit Logs</h1>
-          <span className="text-xs text-zinc-600">{logs.length} entries</span>
+          <h1 className="text-lg font-semibold text-[var(--th-text)]">Audit Logs</h1>
+          <span className="text-xs text-[var(--th-text-muted)]">{logs.length} entries</span>
         </div>
       </div>
 
@@ -77,7 +77,7 @@ export function AuditLogs() {
         <select
           value={filterAction}
           onChange={(e) => setFilterAction(e.target.value)}
-          className="px-3 py-1.5 rounded-lg text-xs bg-surface border border-border text-zinc-300"
+          className="px-3 py-1.5 rounded-lg text-xs bg-surface border border-border text-[var(--th-text)]"
         >
           <option value="">All actions</option>
           <option value="INSERT">INSERT</option>
@@ -89,18 +89,18 @@ export function AuditLogs() {
           placeholder="Filter by table..."
           value={filterTable}
           onChange={(e) => setFilterTable(e.target.value)}
-          className="px-3 py-1.5 rounded-lg text-xs bg-surface border border-border text-zinc-300 placeholder-zinc-700 w-48 focus:outline-none focus:border-brand/40"
+          className="px-3 py-1.5 rounded-lg text-xs bg-surface border border-border text-[var(--th-text)] placeholder-[var(--th-text-muted)] w-48 focus:outline-none focus:border-brand/40"
         />
       </div>
 
       {loading ? (
         <div className="flex items-center justify-center py-16">
-          <Loader2 className="w-5 h-5 animate-spin text-zinc-600" />
+          <Loader2 className="w-5 h-5 animate-spin text-[var(--th-text-muted)]" />
         </div>
       ) : (
         <div className="space-y-1">
           {logs.map((log) => {
-            const style = actionStyles[log.action] || { bg: 'bg-surface', text: 'text-zinc-400', dot: 'bg-zinc-500' }
+            const style = actionStyles[log.action] || { bg: 'bg-surface', text: 'text-[var(--th-text-secondary)]', dot: 'bg-[var(--th-text-secondary)]' }
             const isOpen = expanded === log.id
 
             return (
@@ -124,19 +124,19 @@ export function AuditLogs() {
                   </span>
 
                   {/* Table + row */}
-                  <span className="text-sm text-zinc-200 font-medium">{log.table_name}</span>
+                  <span className="text-sm text-[var(--th-text)] font-medium">{log.table_name}</span>
                   {log.row_id && (
-                    <span className="text-xs text-zinc-600 font-mono">#{log.row_id.slice(0, 8)}</span>
+                    <span className="text-xs text-[var(--th-text-muted)] font-mono">#{log.row_id.slice(0, 8)}</span>
                   )}
 
                   {/* Time + IP */}
-                  <span className="ml-auto text-[11px] text-zinc-600">{relativeTime(log.created_at)}</span>
+                  <span className="ml-auto text-[11px] text-[var(--th-text-muted)]">{relativeTime(log.created_at)}</span>
                   {log.ip_address && (
-                    <span className="text-[10px] text-zinc-700 font-mono">{log.ip_address}</span>
+                    <span className="text-[10px] text-[var(--th-text-muted)] font-mono">{log.ip_address}</span>
                   )}
 
                   <ChevronDown className={cn(
-                    'w-3.5 h-3.5 text-zinc-600 transition-transform',
+                    'w-3.5 h-3.5 text-[var(--th-text-muted)] transition-transform',
                     isOpen && 'rotate-180'
                   )} />
                 </button>
@@ -146,7 +146,7 @@ export function AuditLogs() {
                     {log.old_data && (
                       <div>
                         <p className="text-[10px] text-red-400 uppercase font-semibold mt-3 mb-1.5">Old Data</p>
-                        <pre className="text-xs text-zinc-400 bg-[#0a0a0b] border border-border p-3 rounded-lg overflow-x-auto max-h-48 font-mono">
+                        <pre className="text-xs text-[var(--th-text-secondary)] border border-border p-3 rounded-lg overflow-x-auto max-h-48 font-mono" style={{ background: 'var(--th-bg)' }}>
                           {JSON.stringify(log.old_data, null, 2)}
                         </pre>
                       </div>
@@ -154,7 +154,7 @@ export function AuditLogs() {
                     {log.new_data && (
                       <div>
                         <p className="text-[10px] text-emerald-400 uppercase font-semibold mt-3 mb-1.5">New Data</p>
-                        <pre className="text-xs text-zinc-400 bg-[#0a0a0b] border border-border p-3 rounded-lg overflow-x-auto max-h-48 font-mono">
+                        <pre className="text-xs text-[var(--th-text-secondary)] border border-border p-3 rounded-lg overflow-x-auto max-h-48 font-mono" style={{ background: 'var(--th-bg)' }}>
                           {JSON.stringify(log.new_data, null, 2)}
                         </pre>
                       </div>
@@ -166,10 +166,10 @@ export function AuditLogs() {
           })}
 
           {logs.length === 0 && (
-            <div className="text-center py-16 text-zinc-600">
+            <div className="text-center py-16 text-[var(--th-text-muted)]">
               <ScrollText className="w-12 h-12 mx-auto mb-4 opacity-20" />
               <p className="text-sm font-medium">No audit logs yet</p>
-              <p className="text-xs mt-1 text-zinc-700">Logs will appear after CRUD operations</p>
+              <p className="text-xs mt-1 text-[var(--th-text-muted)]">Logs will appear after CRUD operations</p>
             </div>
           )}
         </div>

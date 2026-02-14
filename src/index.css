@@ -4,19 +4,70 @@
   --color-brand: #6366f1;
   --color-brand-dark: #4f46e5;
   --color-brand-light: #818cf8;
-  --color-surface: #111113;
-  --color-surface-hover: #1a1a1f;
-  --color-sidebar: #111113;
-  --color-border: #1e1e24;
-  --color-border-light: #2a2a32;
+  --color-surface: var(--th-surface);
+  --color-surface-hover: var(--th-surface-hover);
+  --color-sidebar: var(--th-sidebar);
+  --color-border: var(--th-border);
+  --color-border-light: var(--th-border-light);
   --color-muted: #71717a;
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
 }
 
+/* ─── Light Theme (default) ─── */
+:root {
+  --th-bg: #ffffff;
+  --th-surface: #f8f9fa;
+  --th-surface-hover: #e9ecef;
+  --th-sidebar: #f8f9fa;
+  --th-sidebar-active: #ffffff;
+  --th-header: #ffffff;
+  --th-row: #ffffff;
+  --th-row-alt: #f1f3f5;
+  --th-row-hover: #e9ecef;
+  --th-cell-edit: #fff3cd;
+  --th-border: #dee2e6;
+  --th-border-light: #ced4da;
+  --th-text: #212529;
+  --th-text-secondary: #6c757d;
+  --th-text-muted: #adb5bd;
+  --th-scrollbar: #ced4da;
+  --th-scrollbar-hover: #adb5bd;
+  --th-skeleton-from: #e9ecef;
+  --th-skeleton-via: #dee2e6;
+  color-scheme: light;
+}
+
+/* ─── Dark Theme ─── */
+.dark {
+  --th-bg: #0a0a0b;
+  --th-surface: #111113;
+  --th-surface-hover: #1a1a1f;
+  --th-sidebar: #111113;
+  --th-sidebar-active: #27272a;
+  --th-header: #111113;
+  --th-row: #111113;
+  --th-row-alt: #18181b;
+  --th-row-hover: #27272a;
+  --th-cell-edit: #1e1b4b;
+  --th-border: #27272a;
+  --th-border-light: #3f3f46;
+  --th-text: #fafafa;
+  --th-text-secondary: #a1a1aa;
+  --th-text-muted: #52525b;
+  --th-scrollbar: #2a2a32;
+  --th-scrollbar-hover: #3a3a44;
+  --th-skeleton-from: #111113;
+  --th-skeleton-via: #1a1a1f;
+  color-scheme: dark;
+}
+
 body {
   margin: 0;
   font-family: var(--font-sans);
+  background: var(--th-bg);
+  color: var(--th-text);
+  transition: background-color 0.2s, color 0.2s;
 }
 
 /* Scrollbar */
@@ -28,11 +79,11 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #2a2a32;
+  background: var(--th-scrollbar);
   border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #3a3a44;
+  background: var(--th-scrollbar-hover);
 }
 
 /* Toast animation */
@@ -66,19 +117,10 @@ body {
   100% { background-position: 200% 0; }
 }
 .skeleton {
-  background: linear-gradient(90deg, #111113 25%, #1a1a1f 50%, #111113 75%);
+  background: linear-gradient(90deg, var(--th-skeleton-from) 25%, var(--th-skeleton-via) 50%, var(--th-skeleton-from) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
   border-radius: 6px;
-}
-
-/* Page transition */
-@keyframes page-in {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.page-enter {
-  animation: page-in 0.2s ease-out;
 }
 
 /* Focus ring utility */
@@ -89,5 +131,5 @@ body {
 
 /* Alternating table rows */
 .table-striped tr:nth-child(even) td {
-  background-color: rgba(255, 255, 255, 0.015);
+  background-color: var(--th-row-alt);
 }

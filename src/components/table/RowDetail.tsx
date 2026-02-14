@@ -15,10 +15,10 @@ export function RowDetail({ row, onClose, onEdit, onDelete }: Props) {
     <div className="fixed inset-y-0 right-0 w-96 bg-surface border-l border-border shadow-2xl z-40 flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-        <h3 className="font-semibold text-zinc-100 text-sm">Row Detail</h3>
+        <h3 className="font-semibold text-[var(--th-text)] text-sm">Row Detail</h3>
         <button
           onClick={onClose}
-          className="p-1.5 rounded-lg hover:bg-surface-hover text-zinc-500 transition-colors"
+          className="p-1.5 rounded-lg hover:bg-surface-hover text-[var(--th-text-secondary)] transition-colors"
         >
           <X className="w-4 h-4" />
         </button>
@@ -28,13 +28,13 @@ export function RowDetail({ row, onClose, onEdit, onDelete }: Props) {
       <div className="flex-1 overflow-y-auto p-5 space-y-3">
         {Object.entries(row).map(([key, value]) => (
           <div key={key}>
-            <label className="text-[10px] font-semibold text-zinc-600 uppercase tracking-wider">
+            <label className="text-[10px] font-semibold text-[var(--th-text-muted)] uppercase tracking-wider">
               {key}
             </label>
-            <div className={cn(
-              'mt-1 px-3 py-2 rounded-lg bg-[#0a0a0b] border border-border',
-              'text-sm text-zinc-200 break-all whitespace-pre-wrap',
-              value === null && 'text-zinc-700 italic'
+            <div style={{ background: 'var(--th-bg)' }} className={cn(
+              'mt-1 px-3 py-2 rounded-lg border border-border',
+              'text-sm text-[var(--th-text)] break-all whitespace-pre-wrap',
+              value === null && 'text-[var(--th-text-muted)] italic'
             )}>
               {value === null ? 'null' : formatValue(value)}
             </div>

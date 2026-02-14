@@ -66,8 +66,8 @@ export function SqlRunner() {
           <Terminal className="w-4 h-4 text-brand" />
         </div>
         <div>
-          <h1 className="text-lg font-semibold text-zinc-100">SQL Runner</h1>
-          <span className="text-xs text-zinc-600">Read-only queries</span>
+          <h1 className="text-lg font-semibold text-[var(--th-text)]">SQL Runner</h1>
+          <span className="text-xs text-[var(--th-text-muted)]">Read-only queries</span>
         </div>
       </div>
 
@@ -77,11 +77,11 @@ export function SqlRunner() {
           {/* Editor */}
           <div className="bg-surface border border-border rounded-xl overflow-hidden">
             <div className="flex items-center justify-between px-4 py-2 border-b border-border">
-              <span className="text-[10px] font-semibold text-zinc-600 uppercase tracking-wider">Query</span>
+              <span className="text-[10px] font-semibold text-[var(--th-text-muted)] uppercase tracking-wider">Query</span>
               <div className="flex items-center gap-1.5">
                 <button
                   onClick={handleSave}
-                  className="flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] text-zinc-500 hover:text-zinc-300 hover:bg-surface-hover transition-colors"
+                  className="flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] text-[var(--th-text-secondary)] hover:text-[var(--th-text)] hover:bg-surface-hover transition-colors"
                 >
                   <Save className="w-3 h-3" />
                   Save
@@ -112,9 +112,9 @@ export function SqlRunner() {
               rows={8}
               className={cn(
                 'w-full px-4 py-3 bg-transparent',
-                'text-sm text-zinc-100 font-mono resize-y',
+                'text-sm text-[var(--th-text)] font-mono resize-y',
                 'focus:outline-none',
-                'placeholder-zinc-700'
+                'placeholder-[var(--th-text-muted)]'
               )}
               placeholder="SELECT * FROM ..."
               spellCheck={false}
@@ -122,7 +122,7 @@ export function SqlRunner() {
           </div>
 
           {/* Ctrl+Enter hint */}
-          <p className="text-[11px] text-zinc-700">Press Ctrl+Enter to execute</p>
+          <p className="text-[11px] text-[var(--th-text-muted)]">Press Ctrl+Enter to execute</p>
 
           {/* Error */}
           {error && (
@@ -134,7 +134,7 @@ export function SqlRunner() {
           {/* Results */}
           {result && (
             <div className="border border-border rounded-xl overflow-hidden">
-              <div className="px-4 py-2 bg-surface border-b border-border text-[11px] text-zinc-500 font-medium">
+              <div className="px-4 py-2 bg-surface border-b border-border text-[11px] text-[var(--th-text-secondary)] font-medium">
                 {result.rows.length} rows returned
               </div>
               <div className="overflow-x-auto max-h-96">
@@ -142,7 +142,7 @@ export function SqlRunner() {
                   <thead>
                     <tr className="bg-surface">
                       {result.columns.map((col) => (
-                        <th key={col} className="px-3 py-2 text-left text-[11px] font-semibold text-zinc-500 uppercase tracking-wider whitespace-nowrap">
+                        <th key={col} className="px-3 py-2 text-left text-[11px] font-semibold text-[var(--th-text-secondary)] uppercase tracking-wider whitespace-nowrap">
                           {col}
                         </th>
                       ))}
@@ -154,9 +154,9 @@ export function SqlRunner() {
                         {row.map((cell, j) => (
                           <td key={j} className="px-3 py-1.5 whitespace-nowrap">
                             {cell === null ? (
-                              <span className="text-zinc-700 italic text-xs">null</span>
+                              <span className="text-[var(--th-text-muted)] italic text-xs">null</span>
                             ) : (
-                              <span className="text-zinc-300 font-mono text-xs">{String(cell)}</span>
+                              <span className="text-[var(--th-text)] font-mono text-xs">{String(cell)}</span>
                             )}
                           </td>
                         ))}
@@ -171,7 +171,7 @@ export function SqlRunner() {
 
         {/* Saved queries */}
         <div className="space-y-2">
-          <h3 className="text-[10px] font-semibold text-zinc-600 uppercase tracking-wider px-1">
+          <h3 className="text-[10px] font-semibold text-[var(--th-text-muted)] uppercase tracking-wider px-1">
             Saved ({saved.length})
           </h3>
           {saved.map((q, i) => (
@@ -181,19 +181,19 @@ export function SqlRunner() {
               onClick={() => handleLoadSaved(q)}
             >
               <div className="flex items-center justify-between mb-1">
-                <span className="text-sm text-zinc-300 font-medium">{q.name}</span>
+                <span className="text-sm text-[var(--th-text)] font-medium">{q.name}</span>
                 <button
                   onClick={(e) => { e.stopPropagation(); handleDeleteSaved(i) }}
-                  className="opacity-0 group-hover:opacity-100 p-1 hover:bg-surface-hover rounded-md text-zinc-600 transition-all"
+                  className="opacity-0 group-hover:opacity-100 p-1 hover:bg-surface-hover rounded-md text-[var(--th-text-muted)] transition-all"
                 >
                   <Trash2 className="w-3 h-3" />
                 </button>
               </div>
-              <p className="text-[11px] text-zinc-600 font-mono truncate">{q.sql}</p>
+              <p className="text-[11px] text-[var(--th-text-muted)] font-mono truncate">{q.sql}</p>
             </div>
           ))}
           {saved.length === 0 && (
-            <p className="text-[11px] text-zinc-700 px-1">No saved queries yet</p>
+            <p className="text-[11px] text-[var(--th-text-muted)] px-1">No saved queries yet</p>
           )}
         </div>
       </div>

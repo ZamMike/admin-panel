@@ -11,6 +11,7 @@ import { AuditLogs } from '@/pages/AuditLogs'
 import { ToastContainer } from '@/components/ui/Toast'
 import { SearchDialog } from '@/components/ui/SearchDialog'
 import { useSessionTimeout } from '@/hooks/useSessionTimeout'
+import { useTheme } from '@/hooks/useTheme'
 import { api } from '@/lib/api'
 import type { TableInfo } from '@/lib/api'
 
@@ -19,7 +20,7 @@ function Shell() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0a0a0b]">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--th-bg)' }}>
         <div className="w-6 h-6 border-2 border-brand border-t-transparent rounded-full animate-spin" />
       </div>
     )
@@ -35,28 +36,25 @@ function AuthenticatedApp() {
   const [tables, setTables] = useState<TableInfo[]>([])
   const [collapsed, setCollapsed] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
+  const { theme, toggle: toggleTheme } = useTheme()
 
   useSessionTimeout()
 
-  // Custom navigate — pushState + setState
   const navigate = useCallback((to: string) => {
     window.history.pushState(null, '', to)
     setPath(to)
   }, [])
 
-  // Browser back/forward
   useEffect(() => {
     const onPopState = () => setPath(window.location.pathname)
     window.addEventListener('popstate', onPopState)
     return () => window.removeEventListener('popstate', onPopState)
   }, [])
 
-  // Fetch tables
   useEffect(() => {
     api.getTables().then(setTables).catch(console.error)
   }, [])
 
-  // Keyboard shortcuts
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
       if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
@@ -69,7 +67,6 @@ function AuthenticatedApp() {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [])
 
-  // Route matching — pure string matching, no router
   const tableMatch = path.match(/^\/tables\/(.+)$/)
 
   let page: React.ReactNode
@@ -87,7 +84,7 @@ function AuthenticatedApp() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#0a0a0b]">
+    <div className="flex h-screen overflow-hidden" style={{ background: 'var(--th-bg)' }}>
       <Sidebar
         tables={tables}
         collapsed={collapsed}
@@ -96,7 +93,7 @@ function AuthenticatedApp() {
         onNavigate={navigate}
       />
       <div className="flex-1 flex flex-col overflow-hidden">
-        <Header onOpenSearch={() => setSearchOpen(true)} />
+        <Header onOpenSearch={() => setSearchOpen(true)} theme={theme} onToggleTheme={toggleTheme} />
         <main className="flex-1 overflow-auto p-6">
           {page}
         </main>

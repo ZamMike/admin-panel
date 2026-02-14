@@ -68,10 +68,10 @@ export function EditModal({ tableName, schema, row, onClose, onSaved }: Props) {
       <div className="w-full max-w-lg bg-surface border border-border rounded-xl shadow-2xl max-h-[80vh] flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-          <h3 className="font-semibold text-zinc-100 text-sm">
+          <h3 className="font-semibold text-[var(--th-text)] text-sm">
             {isNew ? `New row in ${tableName}` : `Edit row #${row?.id}`}
           </h3>
-          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-surface-hover text-zinc-500 transition-colors">
+          <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-surface-hover text-[var(--th-text-secondary)] transition-colors">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -80,11 +80,11 @@ export function EditModal({ tableName, schema, row, onClose, onSaved }: Props) {
         <div className="flex-1 overflow-y-auto p-5 space-y-3">
           {editableColumns.map((col) => (
             <div key={col.column_name}>
-              <label className="flex items-center gap-2 text-xs font-medium text-zinc-500 mb-1.5">
+              <label className="flex items-center gap-2 text-xs font-medium text-[var(--th-text-secondary)] mb-1.5">
                 <span>{col.column_name}</span>
-                <span className="text-zinc-700 font-mono text-[10px]">{col.data_type}</span>
+                <span className="text-[var(--th-text-muted)] font-mono text-[10px]">{col.data_type}</span>
                 {col.is_nullable === 'YES' && (
-                  <span className="text-zinc-700 text-[10px]">nullable</span>
+                  <span className="text-[var(--th-text-muted)] text-[10px]">nullable</span>
                 )}
               </label>
               {col.data_type === 'text' || col.data_type === 'character varying' || col.data_type === 'jsonb' || col.data_type === 'json' ? (
@@ -92,9 +92,10 @@ export function EditModal({ tableName, schema, row, onClose, onSaved }: Props) {
                   value={values[col.column_name] || ''}
                   onChange={(e) => setValues((prev) => ({ ...prev, [col.column_name]: e.target.value }))}
                   rows={col.data_type.includes('json') ? 4 : 2}
+                  style={{ background: 'var(--th-bg)' }}
                   className={cn(
-                    'w-full px-3 py-2 rounded-lg bg-[#0a0a0b] border border-border',
-                    'text-sm text-zinc-200 resize-y font-mono',
+                    'w-full px-3 py-2 rounded-lg border border-border',
+                    'text-sm text-[var(--th-text)] resize-y font-mono',
                     'focus:outline-none focus:border-brand/50 focus:ring-1 focus:ring-brand/20'
                   )}
                 />
@@ -103,9 +104,10 @@ export function EditModal({ tableName, schema, row, onClose, onSaved }: Props) {
                   type={col.data_type === 'integer' || col.data_type === 'bigint' || col.data_type === 'numeric' ? 'number' : 'text'}
                   value={values[col.column_name] || ''}
                   onChange={(e) => setValues((prev) => ({ ...prev, [col.column_name]: e.target.value }))}
+                  style={{ background: 'var(--th-bg)' }}
                   className={cn(
-                    'w-full px-3 py-2 rounded-lg bg-[#0a0a0b] border border-border',
-                    'text-sm text-zinc-200',
+                    'w-full px-3 py-2 rounded-lg border border-border',
+                    'text-sm text-[var(--th-text)]',
                     'focus:outline-none focus:border-brand/50 focus:ring-1 focus:ring-brand/20'
                   )}
                 />
@@ -118,7 +120,7 @@ export function EditModal({ tableName, schema, row, onClose, onSaved }: Props) {
         <div className="px-5 py-4 border-t border-border flex gap-2 justify-end">
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-lg text-sm text-zinc-400 hover:bg-surface-hover transition-colors"
+            className="px-4 py-2 rounded-lg text-sm text-[var(--th-text-secondary)] hover:bg-surface-hover transition-colors"
           >
             Cancel
           </button>
