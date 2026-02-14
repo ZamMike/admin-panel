@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Outlet, useNavigate } from 'react-router-dom'
+import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { Sidebar } from './Sidebar'
 import { Header } from './Header'
 import { api } from '@/lib/api'
@@ -10,6 +10,7 @@ import type { TableInfo } from '@/lib/api'
 
 export function AppLayout() {
   const navigate = useNavigate()
+  const location = useLocation()
   const [tables, setTables] = useState<TableInfo[]>([])
   const [collapsed, setCollapsed] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
@@ -46,9 +47,7 @@ export function AppLayout() {
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header onOpenSearch={() => setSearchOpen(true)} />
         <main className="flex-1 overflow-auto p-6">
-          <div className="page-enter">
-            <Outlet context={{ tables }} />
-          </div>
+          <Outlet key={location.pathname} context={{ tables }} />
         </main>
       </div>
       <ToastContainer />

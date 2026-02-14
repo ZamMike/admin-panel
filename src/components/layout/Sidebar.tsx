@@ -30,6 +30,7 @@ export function Sidebar({ tables, collapsed, onToggle }: Props) {
   const { pathname } = useLocation()
 
   function go(path: string) {
+    console.log('[NAV] navigate to:', path, '| current:', pathname)
     navigate(path)
   }
 

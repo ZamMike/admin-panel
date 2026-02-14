@@ -2,19 +2,22 @@ import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom'
 import { AuthProvider, useAuth } from '@/lib/auth'
 import { AppLayout } from '@/components/layout/AppLayout'
 import { Login } from '@/pages/Login'
-
-function PageLoader() {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0a0a0b]">
-      <div className="w-6 h-6 border-2 border-brand border-t-transparent rounded-full animate-spin" />
-    </div>
-  )
-}
+import { Dashboard } from '@/pages/Dashboard'
+import { TableView } from '@/pages/TableView'
+import { UsersPage } from '@/pages/Users'
+import { SqlRunner } from '@/pages/SqlRunner'
+import { AuditLogs } from '@/pages/AuditLogs'
 
 // Auth guard — renders layout or redirects to login
 function ProtectedLayout() {
   const { user, loading } = useAuth()
-  if (loading) return <PageLoader />
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#0a0a0b]">
+        <div className="w-6 h-6 border-2 border-brand border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
+  }
   if (!user) return <Navigate to="/login" replace />
   return <AppLayout />
 }
@@ -22,7 +25,13 @@ function ProtectedLayout() {
 // Login page — redirects to dashboard if already logged in
 function LoginGate() {
   const { user, loading } = useAuth()
-  if (loading) return <PageLoader />
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#0a0a0b]">
+        <div className="w-6 h-6 border-2 border-brand border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
+  }
   if (user) return <Navigate to="/" replace />
   return <Login />
 }
@@ -33,35 +42,21 @@ function CatchAll() {
   return <Navigate to={user ? '/' : '/login'} replace />
 }
 
-// Static router — created once, never re-created on re-renders
+// Static router — created once, stable across re-renders
 const router = createBrowserRouter([
   {
     path: '/login',
     Component: LoginGate,
   },
   {
+    path: '/',
     Component: ProtectedLayout,
     children: [
-      {
-        index: true,
-        lazy: () => import('@/pages/Dashboard').then(m => ({ Component: m.Dashboard })),
-      },
-      {
-        path: 'tables/:name',
-        lazy: () => import('@/pages/TableView').then(m => ({ Component: m.TableView })),
-      },
-      {
-        path: 'users',
-        lazy: () => import('@/pages/Users').then(m => ({ Component: m.UsersPage })),
-      },
-      {
-        path: 'sql',
-        lazy: () => import('@/pages/SqlRunner').then(m => ({ Component: m.SqlRunner })),
-      },
-      {
-        path: 'logs',
-        lazy: () => import('@/pages/AuditLogs').then(m => ({ Component: m.AuditLogs })),
-      },
+      { index: true, Component: Dashboard },
+      { path: 'tables/:name', Component: TableView },
+      { path: 'users', Component: UsersPage },
+      { path: 'sql', Component: SqlRunner },
+      { path: 'logs', Component: AuditLogs },
     ],
   },
   {
