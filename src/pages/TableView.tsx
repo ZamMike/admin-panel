@@ -7,6 +7,7 @@ import { EditModal } from '@/components/table/EditModal'
 import { BulkActions } from '@/components/table/BulkActions'
 import { toast } from '@/components/ui/Toast'
 import { api } from '@/lib/api'
+import { exportCSV, exportJSON } from '@/lib/export'
 import { cn } from '@/lib/utils'
 import type { TableInfo } from '@/lib/api'
 
@@ -36,9 +37,25 @@ export function TableView() {
     }
   }
 
-  function handleExportCSV() {
-    // Simple CSV export of current visible data
-    toast('Export CSV — coming in Phase 5', 'info')
+  const [exporting, setExporting] = useState(false)
+
+  async function handleExport(format: 'csv' | 'json') {
+    if (!name) return
+    setExporting(true)
+    try {
+      const result = await api.getTableData(name, { limit: 100, page: 1 })
+      if (format === 'csv') {
+        exportCSV(result.data, name)
+      } else {
+        exportJSON(result.data, name)
+      }
+      toast(`Exported ${result.data.length} rows as ${format.toUpperCase()}`, 'success')
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : 'Export failed'
+      toast(msg, 'error')
+    } finally {
+      setExporting(false)
+    }
   }
 
   if (!name) return null
@@ -59,11 +76,20 @@ export function TableView() {
 
         <div className="flex items-center gap-2">
           <button
-            onClick={handleExportCSV}
-            className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs text-zinc-400 hover:bg-zinc-800 border border-zinc-700 transition-colors"
+            onClick={() => handleExport('csv')}
+            disabled={exporting}
+            className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs text-zinc-400 hover:bg-zinc-800 border border-zinc-700 transition-colors disabled:opacity-50"
           >
             <Download className="w-3.5 h-3.5" />
-            Export
+            CSV
+          </button>
+          <button
+            onClick={() => handleExport('json')}
+            disabled={exporting}
+            className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs text-zinc-400 hover:bg-zinc-800 border border-zinc-700 transition-colors disabled:opacity-50"
+          >
+            <Download className="w-3.5 h-3.5" />
+            JSON
           </button>
           <button
             onClick={() => setEditRow('new')}
