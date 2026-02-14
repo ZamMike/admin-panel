@@ -1,7 +1,10 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { verifyAdmin, supabaseAdmin } from './_lib/auth.js'
+import { checkRateLimit } from './_lib/rateLimit.js'
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  if (checkRateLimit(req, res)) return
+
   if (req.method !== 'GET') {
     return res.status(405).json({ error: 'Method not allowed' })
   }

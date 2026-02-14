@@ -5,6 +5,7 @@ import { AppLayout } from '@/components/layout/AppLayout'
 import { Login } from '@/pages/Login'
 import { ToastContainer } from '@/components/ui/Toast'
 import { SearchDialog } from '@/components/ui/SearchDialog'
+import { useSessionTimeout } from '@/hooks/useSessionTimeout'
 import type { User } from '@supabase/supabase-js'
 
 // Lazy load pages for code-splitting
@@ -12,6 +13,7 @@ const Dashboard = lazy(() => import('@/pages/Dashboard').then(m => ({ default: m
 const TableView = lazy(() => import('@/pages/TableView').then(m => ({ default: m.TableView })))
 const UsersPage = lazy(() => import('@/pages/Users').then(m => ({ default: m.UsersPage })))
 const SqlRunner = lazy(() => import('@/pages/SqlRunner').then(m => ({ default: m.SqlRunner })))
+const AuditLogs = lazy(() => import('@/pages/AuditLogs').then(m => ({ default: m.AuditLogs })))
 
 function PageLoader() {
   return (
@@ -24,6 +26,9 @@ function PageLoader() {
 function AppRoutes({ user }: { user: User | null }) {
   const navigate = useNavigate()
   const [searchOpen, setSearchOpen] = useState(false)
+
+  // Auto-logout after 24h inactivity
+  useSessionTimeout()
 
   // Global keyboard shortcuts
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
@@ -68,6 +73,7 @@ function AppRoutes({ user }: { user: User | null }) {
               <Route path="tables/:name" element={<TableView />} />
               <Route path="users" element={<UsersPage />} />
               <Route path="sql" element={<SqlRunner />} />
+              <Route path="logs" element={<AuditLogs />} />
             </Route>
           ) : (
             <Route path="*" element={<Navigate to="/login" replace />} />

@@ -1,5 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 import { verifyAdmin, supabaseAdmin } from '../_lib/auth.js'
+import { checkRateLimit } from '../_lib/rateLimit.js'
+import { logAction } from '../_lib/audit.js'
 
 // Whitelist of safe table name characters
 function isValidTableName(name: string): boolean {
@@ -7,8 +9,11 @@ function isValidTableName(name: string): boolean {
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  if (checkRateLimit(req, res)) return
+
+  let adminEmail: string
   try {
-    await verifyAdmin(req)
+    adminEmail = await verifyAdmin(req)
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : 'Unauthorized'
     return res.status(403).json({ error: msg })
@@ -24,11 +29,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       case 'GET':
         return await handleGet(req, res, tableName)
       case 'POST':
-        return await handleInsert(req, res, tableName)
+        return await handleInsert(req, res, tableName, adminEmail)
       case 'PUT':
-        return await handleUpdate(req, res, tableName)
+        return await handleUpdate(req, res, tableName, adminEmail)
       case 'DELETE':
-        return await handleDelete(req, res, tableName)
+        return await handleDelete(req, res, tableName, adminEmail)
       default:
         return res.status(405).json({ error: 'Method not allowed' })
     }
@@ -75,8 +80,6 @@ async function handleGet(req: VercelRequest, res: VercelResponse, table: string)
 
   // Apply global search — search across text-like columns
   if (search) {
-    // Use or() with ilike on common text columns
-    // This is a basic approach; enhanced in Phase 2 with schema-aware search
     query = query.or(
       `id.eq.${search},` +
       `email.ilike.%${search}%,` +
@@ -105,7 +108,7 @@ async function handleGet(req: VercelRequest, res: VercelResponse, table: string)
   })
 }
 
-async function handleInsert(req: VercelRequest, res: VercelResponse, table: string) {
+async function handleInsert(req: VercelRequest, res: VercelResponse, table: string, adminEmail: string) {
   const body = req.body
   if (!body || typeof body !== 'object') {
     return res.status(400).json({ error: 'Request body required' })
@@ -118,14 +121,24 @@ async function handleInsert(req: VercelRequest, res: VercelResponse, table: stri
     .single()
 
   if (error) return res.status(500).json({ error: error.message })
+
+  await logAction(req, adminEmail, 'INSERT', table, String(data.id), null, data)
+
   return res.status(201).json(data)
 }
 
-async function handleUpdate(req: VercelRequest, res: VercelResponse, table: string) {
+async function handleUpdate(req: VercelRequest, res: VercelResponse, table: string, adminEmail: string) {
   const { id, ...updates } = req.body || {}
   if (!id) {
     return res.status(400).json({ error: 'id is required' })
   }
+
+  // Fetch old data for audit
+  const { data: oldData } = await supabaseAdmin
+    .from(table)
+    .select('*')
+    .eq('id', id)
+    .single()
 
   const { data, error } = await supabaseAdmin
     .from(table)
@@ -135,14 +148,23 @@ async function handleUpdate(req: VercelRequest, res: VercelResponse, table: stri
     .single()
 
   if (error) return res.status(500).json({ error: error.message })
+
+  await logAction(req, adminEmail, 'UPDATE', table, String(id), oldData, data)
+
   return res.json(data)
 }
 
-async function handleDelete(req: VercelRequest, res: VercelResponse, table: string) {
+async function handleDelete(req: VercelRequest, res: VercelResponse, table: string, adminEmail: string) {
   const { ids } = req.body || {}
   if (!ids || !Array.isArray(ids) || ids.length === 0) {
     return res.status(400).json({ error: 'ids array required' })
   }
+
+  // Fetch old data for audit
+  const { data: oldRows } = await supabaseAdmin
+    .from(table)
+    .select('*')
+    .in('id', ids)
 
   const { error } = await supabaseAdmin
     .from(table)
@@ -150,5 +172,11 @@ async function handleDelete(req: VercelRequest, res: VercelResponse, table: stri
     .in('id', ids)
 
   if (error) return res.status(500).json({ error: error.message })
+
+  // Log each deletion
+  for (const row of oldRows || []) {
+    await logAction(req, adminEmail, 'DELETE', table, String(row.id), row, null)
+  }
+
   return res.json({ deleted: ids.length })
 }

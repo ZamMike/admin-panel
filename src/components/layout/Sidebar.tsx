@@ -5,6 +5,7 @@ import {
   Database,
   Users,
   Terminal,
+  ScrollText,
   ChevronRight,
   Table2,
 } from 'lucide-react'
@@ -18,6 +19,7 @@ type Props = {
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/users', icon: Users, label: 'Users' },
+  { to: '/logs', icon: ScrollText, label: 'Audit Logs' },
   { to: '/sql', icon: Terminal, label: 'SQL Runner' },
 ]
 

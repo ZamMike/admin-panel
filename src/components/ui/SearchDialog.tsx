@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { Search, Table2, LayoutDashboard, Users, Terminal } from 'lucide-react'
+import { Search, Table2, LayoutDashboard, Users, Terminal, ScrollText } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { api } from '@/lib/api'
 import type { TableInfo } from '@/lib/api'
@@ -20,6 +20,7 @@ type SearchItem = {
 const staticItems: SearchItem[] = [
   { label: 'Dashboard', path: '/', icon: LayoutDashboard, type: 'page' },
   { label: 'Users', path: '/users', icon: Users, type: 'page' },
+  { label: 'Audit Logs', path: '/logs', icon: ScrollText, type: 'page' },
   { label: 'SQL Runner', path: '/sql', icon: Terminal, type: 'page' },
 ]
 
